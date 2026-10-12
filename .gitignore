@@ -1,0 +1,10 @@
+target/
+.classpath
+.project
+.settings/
+.factorypath
+*.log
+.env
+.env.*
+!.env.example
+application-local.properties
