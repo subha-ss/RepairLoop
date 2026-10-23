@@ -24,7 +24,7 @@ public class UserService {
     public User registerUser(User user) {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new IllegalArgumentException(
-                "An account with this email already exists."
+                    "An account with this email already exists."
             );
         }
 
@@ -35,5 +35,9 @@ public class UserService {
 
     public Optional<User> findUserByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    public boolean verifyPassword(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 }

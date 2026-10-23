@@ -1,10 +1,13 @@
 
 package com.repairloop.controller;
 
+import com.repairloop.dto.LoginRequest;
 import com.repairloop.dto.RegisterRequest;
 import com.repairloop.entity.User;
 import com.repairloop.service.UserService;
+
 import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,18 +38,47 @@ public class AuthController {
             User savedUser = userService.registerUser(user);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(
-                Map.of(
-                    "message", "Registration successful",
-                    "userId", savedUser.getId(),
-                    "fullName", savedUser.getFullName(),
-                    "email", savedUser.getEmail()
-                )
+                    Map.of(
+                            "message", "Registration successful",
+                            "userId", savedUser.getId(),
+                            "fullName", savedUser.getFullName(),
+                            "email", savedUser.getEmail()
+                    )
             );
 
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(
-                Map.of("error", exception.getMessage())
+                    Map.of("error", exception.getMessage())
             );
         }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(
+            @Valid @RequestBody LoginRequest request) {
+
+        return userService.findUserByEmail(request.getEmail())
+                .filter(user -> userService.verifyPassword(
+                        request.getPassword(),
+                        user.getPassword()
+                ))
+                .<ResponseEntity<?>>map(user ->
+                        ResponseEntity.ok(
+                                Map.of(
+                                        "message", "Login successful",
+                                        "userId", user.getId(),
+                                        "fullName", user.getFullName(),
+                                        "email", user.getEmail()
+                                )
+                        )
+                )
+                .orElseGet(() ->
+                        ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                                Map.of(
+                                        "error",
+                                        "Invalid email or password"
+                                )
+                        )
+                );
     }
 }
