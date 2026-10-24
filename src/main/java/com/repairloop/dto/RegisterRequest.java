@@ -12,15 +12,17 @@ public class RegisterRequest {
     private String fullName;
 
     @NotBlank(message = "Email is required")
-    @Email(message = "Please enter a valid email address")
+    @Email(message = "Enter a valid email address")
     @Size(max = 150, message = "Email cannot exceed 150 characters")
     private String email;
 
     @NotBlank(message = "Password is required")
-    @Size(min = 8, max = 72, message = "Password must contain 8 to 72 characters")
+    @Size(min = 8, max = 100,
+          message = "Password must be between 8 and 100 characters")
     private String password;
 
-    @Size(max = 15, message = "Phone cannot exceed 15 characters")
+    @NotBlank(message = "Phone number is required")
+    @Size(max = 20, message = "Phone number cannot exceed 20 characters")
     private String phone;
 
     public RegisterRequest() {

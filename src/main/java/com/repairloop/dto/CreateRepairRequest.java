@@ -2,25 +2,17 @@
 package com.repairloop.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import jakarta.validation.constraints.Positive;
 
 public class CreateRepairRequest {
 
-    @NotNull(message = "User ID is required")
-    @Positive(message = "User ID must be positive")
-    private Long userId;
-
     @NotBlank(message = "Device type is required")
-    @Size(max = 50, message = "Device type cannot exceed 50 characters")
     private String deviceType;
 
     @NotBlank(message = "Brand is required")
-    @Size(max = 100, message = "Brand cannot exceed 100 characters")
     private String brand;
 
-    @Size(max = 100, message = "Model cannot exceed 100 characters")
+    @NotBlank(message = "Model is required")
     private String model;
 
     @NotBlank(message = "Problem description is required")
@@ -28,14 +20,6 @@ public class CreateRepairRequest {
     private String problemDescription;
 
     public CreateRepairRequest() {
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 
     public String getDeviceType() {

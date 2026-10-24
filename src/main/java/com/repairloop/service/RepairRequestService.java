@@ -22,6 +22,7 @@ public class RepairRequestService {
         this.userRepository = userRepository;
     }
 
+    // Create a new repair request
     public RepairRequest createRepairRequest(RepairRequest request) {
 
         if (!userRepository.existsById(request.getUserId())) {
@@ -36,6 +37,7 @@ public class RepairRequestService {
         return repairRequestRepository.save(request);
     }
 
+    // Get all repair requests for a particular user
     public List<RepairRequest> getRequestsByUserId(Long userId) {
 
         if (!userRepository.existsById(userId)) {
@@ -43,5 +45,34 @@ public class RepairRequestService {
         }
 
         return repairRequestRepository.findByUserId(userId);
+    }
+
+    // Update the status of an existing repair request
+    public RepairRequest updateRepairStatus(
+            Long repairId, String newStatus) {
+
+        RepairRequest request = repairRequestRepository.findById(repairId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "Repair request not found."
+                        )
+                );
+
+        if (!"IN_PROGRESS".equals(newStatus)
+                && !"COMPLETED".equals(newStatus)) {
+            throw new IllegalArgumentException(
+                    "Status must be IN_PROGRESS or COMPLETED."
+            );
+        }
+
+        if ("COMPLETED".equals(request.getStatus())) {
+            throw new IllegalArgumentException(
+                    "A completed repair cannot be updated."
+            );
+        }
+
+        request.setStatus(newStatus);
+
+        return repairRequestRepository.save(request);
     }
 }

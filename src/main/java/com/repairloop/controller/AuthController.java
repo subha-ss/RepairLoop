@@ -1,6 +1,7 @@
 
 package com.repairloop.controller;
 
+import com.repairloop.config.JwtService;
 import com.repairloop.dto.LoginRequest;
 import com.repairloop.dto.RegisterRequest;
 import com.repairloop.entity.User;
@@ -19,9 +20,13 @@ import java.util.Map;
 public class AuthController {
 
     private final UserService userService;
+    private final JwtService jwtService;
 
-    public AuthController(UserService userService) {
+    public AuthController(
+            UserService userService,
+            JwtService jwtService) {
         this.userService = userService;
+        this.jwtService = jwtService;
     }
 
     @PostMapping("/register")
@@ -62,16 +67,25 @@ public class AuthController {
                         request.getPassword(),
                         user.getPassword()
                 ))
-                .<ResponseEntity<?>>map(user ->
-                        ResponseEntity.ok(
-                                Map.of(
-                                        "message", "Login successful",
-                                        "userId", user.getId(),
-                                        "fullName", user.getFullName(),
-                                        "email", user.getEmail()
-                                )
-                        )
-                )
+                .<ResponseEntity<?>>map(user -> {
+
+                    String token = jwtService.generateToken(
+                            user.getId(),
+                            user.getEmail(),
+                            user.getRole()
+                    );
+
+                    return ResponseEntity.ok(
+                            Map.of(
+                                    "message", "Login successful",
+                                    "userId", user.getId(),
+                                    "fullName", user.getFullName(),
+                                    "email", user.getEmail(),
+                                    "role", user.getRole(),
+                                    "token", token
+                            )
+                    );
+                })
                 .orElseGet(() ->
                         ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                                 Map.of(

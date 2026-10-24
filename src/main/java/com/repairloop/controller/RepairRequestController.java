@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,12 +26,16 @@ public class RepairRequestController {
         this.repairRequestService = repairRequestService;
     }
 
+    // Create a repair request for the authenticated user
     @PostMapping
     public ResponseEntity<?> createRepairRequest(
-            @Valid @RequestBody CreateRepairRequest request) {
+            @Valid @RequestBody CreateRepairRequest request,
+            Authentication authentication) {
+
+        Long userId = getAuthenticatedUserId(authentication);
 
         RepairRequest repairRequest = new RepairRequest();
-        repairRequest.setUserId(request.getUserId());
+        repairRequest.setUserId(userId);
         repairRequest.setDeviceType(request.getDeviceType());
         repairRequest.setBrand(request.getBrand());
         repairRequest.setModel(request.getModel());
@@ -51,20 +56,20 @@ public class RepairRequestController {
         }
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getRequestsByUser(
-            @PathVariable Long userId) {
+    // Retrieve only the authenticated user's repair requests
+    @GetMapping
+    public ResponseEntity<List<RepairRequest>> getMyRepairRequests(
+            Authentication authentication) {
 
-        try {
-            List<RepairRequest> requests =
-                    repairRequestService.getRequestsByUserId(userId);
+        Long userId = getAuthenticatedUserId(authentication);
 
-            return ResponseEntity.ok(requests);
+        List<RepairRequest> requests =
+                repairRequestService.getRequestsByUserId(userId);
 
-        } catch (IllegalArgumentException exception) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    Map.of("error", exception.getMessage())
-            );
-        }
+        return ResponseEntity.ok(requests);
+    }
+
+    private Long getAuthenticatedUserId(Authentication authentication) {
+        return (Long) authentication.getPrincipal();
     }
 }
