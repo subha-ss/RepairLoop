@@ -1,3 +1,4 @@
+
 package com.repairloop.dto;
 
 import jakarta.validation.constraints.NotBlank;
@@ -7,8 +8,8 @@ public class UpdateRepairStatusRequest {
 
     @NotBlank(message = "Status is required")
     @Pattern(
-        regexp = "IN_PROGRESS|COMPLETED",
-        message = "Status must be IN_PROGRESS or COMPLETED"
+        regexp = "DIAGNOSING|IN_PROGRESS|COMPLETED",
+        message = "Status must be DIAGNOSING, IN_PROGRESS, or COMPLETED"
     )
     private String status;
 

@@ -3,6 +3,7 @@ package com.repairloop.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -38,11 +39,15 @@ public class SecurityConfig {
                 )
             )
             .authorizeHttpRequests(auth -> auth
+            		.requestMatchers(
+            			    "/api/auth/register",
+            			    "/api/auth/login",
+            			    "/api/health",
+            			    "/error"
+            			).permitAll()
                 .requestMatchers(
-                    "/api/auth/register",
-                    "/api/auth/login",
-                    "/api/health"
-                ).permitAll()
+                    HttpMethod.PATCH, "/api/repairs/*/status"
+                ).hasAnyRole("STAFF", "ADMIN")
                 .anyRequest().authenticated()
             )
             .addFilterBefore(
